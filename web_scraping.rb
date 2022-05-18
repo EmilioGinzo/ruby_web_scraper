@@ -7,7 +7,7 @@ require 'launchy' #abrir urls en navegador
 def get_repositories(topic)
     url = "https://github.com/topics/"
     url = url + topic
-    print("connecting to ",url,"\n")
+    puts("connecting to #{url}")
     unparse_page = HTTParty.get(url)
     parse_page = Nokogiri::HTML(unparse_page.body)
     repositories_text = parse_page.xpath('/html/body/div[4]/main/div[2]/div[2]/div/div[1]/h2').text
@@ -59,7 +59,7 @@ end
 def github_rating(list_dict_languages, min_repositories, max_repositories)
     difference_max_min = max_repositories - min_repositories
     list_dict_languages.each do |dict_language|
-        calculated_rating = ((dict_language[:repositories].to_f - min_repositories)/difference_max_min)*100
+        calculated_rating = ((dict_language[:repositories].to_f - min_repositories.to_f)/difference_max_min)*100
         dict_language.store(:github_rating, calculated_rating)
     end
     return list_dict_languages
@@ -85,25 +85,24 @@ def grafico(list_dict_languages)
     #grafico
     qc = QuickChart.new(
         {
-          type: "bar",
-          data: {
+        type: "bar",
+        data: {
             labels: array_nombres,
             datasets: [{
-              label: "Lenguajes",
-              data: array_nro_apariciones
+            label: "Lenguajes",
+            data: array_nro_apariciones
             }]
-          }
+        }
         },
         width: 600,
         height: 300,
         device_pixel_ratio: 2.0,
-      )
-      
-      # Print the chart URL
-      #print("para ver el gráfico por favor acceda a:",qc.get_url)
-      Launchy.open(qc.get_url)
+    )
+    
+    # Print the chart URL
+    #print("para ver el gráfico por favor acceda a:",qc.get_url)
+    Launchy.open(qc.get_url)
 end
-
 
 
 
@@ -117,7 +116,6 @@ list_dict_languages = github_rating(list_dict_languages, min_repositories, max_r
 #ordeno en forma descendiente por rating
 #https://stackoverflow.com/questions/3154111/
 list_dict_languages.sort_by! { |k| k[:repositories]}.reverse!
-print("LISTAA:",list_dict_languages,"\n")
 
 #imprimir en pantalla
 list_dict_languages.each do |language|
